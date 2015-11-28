@@ -1,0 +1,29 @@
+{
+	"name": "jstewmc/transient",
+	"description": "Dynamic methods and properties in PHP",
+	"license": "MIT",
+	"keywords": ["PHP", "transient", "entity", "method", "property"],
+	"authors": [
+		{
+			"name": "Jack Clayton",
+			"email": "clayjs0@gmail.com"	
+		}
+	],
+	"repositories": [
+        {
+            "url": "https://github.com/jstewmc/refraction.git",
+            "type": "git"
+        }
+    ],
+	"require": {
+    	"jstewmc/refraction": "dev-master"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "4.2.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"Jstewmc\\Transient\\": "src/"
+		}
+	}
+}

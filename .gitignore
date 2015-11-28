@@ -1,0 +1,5 @@
+# ignore Composer's lock file
+composer.lock
+
+# ignore COmposer's vendor directory
+vendor/
