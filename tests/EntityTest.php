@@ -306,9 +306,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !attach() */
     
     /**
-     * attach() should return self if source entity is empty
+     * attach() should return self if source object is empty
      */
-    public function test_attach_returnsSelf_ifEntityIsEmpty()
+    public function test_attach_returnsSelf_ifObjectIsEmpty()
     {
         $foo   = new Foo();
         $blank = new Blank();
@@ -334,9 +334,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * attach() should return self if source entity is not empty
+     * attach() should return self if source object is not empty
      */
-    public function test_attach_returnsSelf_ifEntityIsNotEmpty()
+    public function test_attach_returnsSelf_ifObjectIsNotEmpty()
     {
         $foo = new Foo();
         $bar = new Bar();
@@ -363,6 +363,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     
         return;
     }
+    
     
     /* !detach() */
     

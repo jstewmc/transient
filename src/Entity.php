@@ -229,22 +229,41 @@ abstract class Entity
     /* !Public methods */
     
     /**
-     * Attaches an entity to the entity (atomic)
+     * Attaches an object to the entity
      *
-     * Keep in mind, I'm atomic. I will either attach *all* of the entity's methods 
+     * Keep in mind, I'm atomic. I will either attach *all* of the object's methods 
      * and properties, or I will attach *none* of them.
      *
-     * @param   Jstewmc\Transient\Entity  $entity  the entity to attach
+     * @param   object  $object  the object to attach
+     * @throws  InvalidArgumentException  if $object is not an object
      * @throws  InvalidArgumentException  if method names collide
      * @throws  InvalidArgumentException  if property names collide
      * @return  self
      * @since   0.1.0
      */
-    final public function attach(Entity $entity) 
+    final public function attach($object) 
     {
-        // get the entity's methods and properties
-        $methods    = $entity->getMethods();
-        $properties = $entity->getProperties();
+        if ( ! is_object($object)) {
+            throw new \InvalidArgumentException(
+                __METHOD__."() expects parameter one, object, to be, well, an object"
+            );
+        }
+        
+        // get the object's methods and properties
+        // keep in mind, an entity is more self-aware of its methods and properties,
+        //     because it has to be (it has both *defined* and *transient* ones)
+        //
+        if ($object instanceof Entity) {
+            $methods    = $object->getMethods();
+            $properties = $object->getProperties();
+        } else {
+            // otherwise, it's a normal object
+            // use refraction to get the object's methods and properties
+            //
+            $refraction = new RefractionClass($object);
+            $methods    = $refraction->getMethods();
+            $properties = $refraction->getProperties();
+        }
         
         // if method names collide, short-circuit
         if ($this->hasMethods($methods)) {
