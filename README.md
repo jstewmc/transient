@@ -31,7 +31,7 @@ $bar = new Bar();
 // attach bar to foo
 $foo->attach($bar);
 
-// call foo's bar() method?!
+// call foo's (new) bar() method
 $foo->bar();
 ```
 
