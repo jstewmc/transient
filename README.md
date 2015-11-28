@@ -86,7 +86,7 @@ class Bar extends Entity
     }
 }
 
-class Baz entends Entity
+class Baz extends Entity
 {
     public $baz = 'baz';    
 }
@@ -126,7 +126,7 @@ $foo->baz;       // returns "quux"
 
 When you're done, you can detach the _source_ entity from the _destination_ entity:
 
-``` 
+```php
 // ... continuing the example above
 
 count($foo->getMethods());  // returns 4
@@ -136,7 +136,7 @@ $foo->detach($bar);
 count($foo->getMethods());  // returns 2
 ```
 
-If the need arises (and it probably won't), you can get an entity's properties and methods as [Refractions](https://github.com/jstewmc/refraction) via the `getMethods()` and `getProperties()` methods. (Refraction is a library I wrote for use in this library.)
+If the need arises (and it probably won't), you can get an entity's properties and methods as [Refractions](https://github.com/jstewmc/refraction) via the `getMethods()` and `getProperties()` methods. Refraction is a library I wrote for use in this library.
 
 
 ## Limitations
@@ -244,13 +244,13 @@ This library is visiblity safe.
 When attaching a _source_ entity to a _destination_ entity:
 
 * A _destination_ entity can see the _private_, _protected_, and _public_ methods and properties of a _source_ entity.
-* A _destination_ entity can see the _protected_ and _public_ methods and properties of a _source_ entity's parent.
+* A _destination_ entity can see the _protected_ and _public_ methods and properties of a _source_ entity's parents.
 
-Once attached, an outside class can only see the _destination_ entity's _public_ methods and properties (which, of course, now include the public methods and public properties of any attached _source_ entity).
+An outside class can only see the _destination_ entity's _public_ methods and properties (which, of course, include the public methods and public properties of any attached _source_ entity).
 
 ## That's it!
 
-That's about ti! Of course, this is the first version, and I'm sure I missed something. Any issues, comments, and suggestions are appreciated.
+That's about it! This is the first version, of course. I'm sure I missed something. Any issues, comments, and suggestions are appreciated.
 
 ## About
 
@@ -258,9 +258,16 @@ In late 2015, I was introduced to the [Data Context Interaction (DCI) paradigm](
 
 Programs used to be procedures. It was (pretty) obvious what the program did, but you repeated yourself all the time. Now, programs are loosely-coupled objects. You never repeat yourself, but you have no idea what the program does. 
 
-It's almost as if we went too far in the object-oriented direction. We need a way to encapsulate properties and methods into objects, but we also need a way to collect the steps to accomplish an objective. It's this balance between object-oriented design and procedural design that interested me about the DCI pattern. 
+It's almost as if we went too far in the object-oriented direction. We need a way to encapsulate properties and methods into objects, of course. But, we also need a way to collect steps to accomplish an objective. It's this balance between object-oriented design and procedural design that interested me about the DCI pattern. 
 
-Unfortunately, PHP does not lend itself to the DCI pattern (which requires the fluid movement of properties and methods between objects) very well. PHP does not allow the addition of methods or properties at run-time. That's why I build the Transient library. With Transient, you can attach objects to each other, and they'll behave as if they were the same object.
+Unfortunately, PHP does not lend itself to the DCI pattern very well. DCI requires the fluid movement of properties and methods between objects, but PHP does not allow the addition of methods or properties to an object after compile-time. That's why I built the Transient library. With Transient, you can attach objects to each other, and they'll behave as if they were the same object. Woot!
+
+## Todo
+
+Here are a few improvements I'm thinking about:
+
+* Do you have to attach an Entity? Why not just allow the programmer to attach an entity or a vanilla object?
+* We should allow a _source_ entity to define requirements, like an interface it expects the _destination_ entity to implement at a minimum.
 
 ## Author
 
