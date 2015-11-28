@@ -368,9 +368,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !detach() */
     
     /**
-     * detach() should return self if entity is empty
+     * detach() should return self if object is empty
      */
-    public function test_detach_returnsSelf_ifEntityIsEmpty()
+    public function test_detach_returnsSelf_ifObjectIsEmpty()
     {
         $foo   = new Foo();
         $blank = new Blank();
@@ -396,9 +396,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * detach() should return self if entity is not attached
+     * detach() should return self if object is not attached
      */
-    public function test_detach_returnsSelf_ifEntityIsNotAttached()
+    public function test_detach_returnsSelf_ifObjectIsNotAttached()
     {
         $foo = new Foo();
         $bar = new Bar();
@@ -424,9 +424,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * detach() should return self if entity is attached
+     * detach() should return self if object is attached
      */
-    public function test_detach_returnsSelf_ifEntityIsAttached()
+    public function test_detach_returnsSelf_ifObjectIsAttached()
     {
         $foo = new Foo();
         $bar = new Bar();

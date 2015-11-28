@@ -249,11 +249,9 @@ abstract class Entity
             );
         }
         
-        // get the object's methods and properties
-        // keep in mind, an entity is more self-aware of its methods and properties,
-        //     because it has to be (it has both *defined* and *transient* ones)
-        //
+        // if the object is an entity
         if ($object instanceof Entity) {
+            // get the entity's methods and properties
             $methods    = $object->getMethods();
             $properties = $object->getProperties();
         } else {
@@ -299,16 +297,42 @@ abstract class Entity
     }   
     
     /**
-     * Detaches an entity from the entity
+     * Detaches an object from the entity
      *
-     * @param   Jstewmc\Transient\Entity  $entity  the entity to detach
+     * Keep in mind, I'll detach properties and methods by name, not the object's 
+     * instance. So, you don't have to pass the same object reference to detach 
+     * methods and properties as you did to attach them.
+     *
+     * @param   object  $object  the object to detach
      * @return  self
+     * @throws  InvalidArgumentException  if $object is not an object
      * @since   0.1.0
      */
-    final public function detach(Entity $entity)
+    final public function detach($object)
     {
-        $this->detachProperties($entity->getProperties());
-        $this->detachMethods($entity->getMethods());
+        if ( ! is_object($object)) {
+            throw new \InvalidArgumentException(
+                __METHOD__."() expects parameter one, object, to be a, well, object"
+            );    
+        }
+        
+        // if the object is an entity
+        if ($object instanceof Entity) {
+            // get the entity's properties and methods
+            $methods    = $object->getMethods();
+            $properties = $object->getProperties();
+        } else {
+            // otherwise, the object is a normal PHP object
+            // use refraction to the object's properties and methods
+            //
+            $refraction = new RefractionClass($object);
+            $methods    = $refraction->getMethods();
+            $properties = $refraction->getProperties();
+        }
+        
+        // detach the methods and properties
+        $this->detachProperties($properties);
+        $this->detachMethods($methods);
         
         return $this;
     }
