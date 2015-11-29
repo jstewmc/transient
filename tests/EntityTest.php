@@ -13,9 +13,10 @@ use Jstewmc\Transient\Tests\Foo;
 use Jstewmc\Transient\Tests\Bar; 
 use Jstewmc\Transient\Tests\Baz;
 
-use Jstewmc\Transient\Tests\Blank;   // a class with no properties or methods
-use Jstewmc\Transient\Tests\Closed;  // a class with protected properties and methods
-use Jstewmc\Transient\Tests\Open;    // a class with public properties and methods
+use Jstewmc\Transient\Tests\Blank;     // a class with no properties/methods
+use Jstewmc\Transient\Tests\Closed;    // a class with protected properties/methods
+use Jstewmc\Transient\Tests\Open;      // a class with public properties/methods
+use Jstewmc\Transient\Tests\Required;  // a class with required properties/methods
 
 use Jstewmc\Refraction\RefractionClass;
 use Jstewmc\Refraction\RefractionMethod;
@@ -495,6 +496,25 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
         
         return;
+    }
+    
+    
+    /* !getRequiredMethods() */
+    
+    /**
+     * getRequiredMethods should return an array if requirements do not exist
+     */
+    public function test_getRequiredMethods_returnsArray_ifRequirementsDoNotExist()
+    {
+        return $this->assertEquals([], (new Blank())->getRequiredMethods());
+    }
+    
+    /**
+     * getRequiredMethods should return an array if requirements do exist
+     */
+    public function test_getRequiredMethods_returnsArray_ifRequirementsDoExist()
+    {
+        return $this->assertEquals(['foo'], (new Required())->getRequiredMethods());    
     }
     
     

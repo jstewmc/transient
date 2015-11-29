@@ -31,6 +31,14 @@ abstract class Entity
     /* !Protected properties */
     
     /**
+     * @var  string[]  an array of methods names that must be present in the 
+     *     destination entity for this entity to be attached (regardless of 
+     *     visibility) (case-insensitive)
+     * @since  0.1.0
+     */
+    protected static $requiredMethods = [];
+    
+    /**
      * @var  RefractionMethod[]  the entity's transient methods, indexed by method 
      *     name
      * @since  0.1.0
@@ -43,6 +51,20 @@ abstract class Entity
      * @since  0.1.0
      */
     protected $transientProperties = [];
+    
+    
+    /* !Get methods */
+    
+    /**
+     * Returns the entity's required methods
+     *
+     * @return  string[]  the entity's required methods
+     * @since   0.1.0
+     */
+    final public function getRequiredMethods()
+    {
+        return static::$requiredMethods;
+    }
     
     
     /* !Magic methods */
