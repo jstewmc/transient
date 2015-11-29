@@ -18,6 +18,9 @@ use Jstewmc\Transient\Tests\Closed;    // a class with protected properties/meth
 use Jstewmc\Transient\Tests\Open;      // a class with public properties/methods
 use Jstewmc\Transient\Tests\Required;  // a class with required properties/methods
 
+use Jstewmc\Transient\Tests\FooPropertyCollision;
+use Jstewmc\Transient\Tests\FooMethodCollision;
+
 use Jstewmc\Refraction\RefractionClass;
 use Jstewmc\Refraction\RefractionMethod;
 use Jstewmc\Refraction\RefractionProperty;
@@ -328,6 +331,33 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('InvalidArgumentException');
         
         (new Blank())->attach(new Required());
+        
+        return;
+    }
+    
+    /**
+     * attach() should throw an InvalidArgumentException if one or more properties
+     *     collide
+     * @group  foo
+     */
+    public function test_attach_throwsInvalidArgumentException_ifPropertiesCollide()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        
+        (new Foo())->attach(new FooPropertyCollision());
+     
+        return;
+    }
+    
+    /**
+     * attach() should throw an InvalidArgumentException if one or more methods 
+     *     collide
+     */
+    public function test_attach_throwsInvalidArgumentException_ifMethodsCollide()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        
+        (new Foo())->attach(new FooMethodCollision());
         
         return;
     }
