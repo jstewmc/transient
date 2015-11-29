@@ -309,6 +309,18 @@ abstract class Entity
                 );
             }
             
+            // if the entity is missing a required property, short-circuit
+            if ( ! $this->hasAllProperties($object->getRequiredProperties())) {
+                // get the missing properties
+                $properties = $this->diffProperties($object->getRequiredProperties());
+                // get the property names as a human-friendly string
+                $list = $this->listProperties($properties);
+                // short-circuit
+                throw new \InvalidArgumentException(
+                    "The entity is missing the following required properties: $list"
+                );
+            }
+            
             // otherwise, get the entity's methods and properties
             $methods    = $object->getMethods();
             $properties = $object->getProperties();
@@ -335,7 +347,7 @@ abstract class Entity
         }
         
         // if property names collide, short-circuit
-        if ($this->hasProperties($properties)) {
+        if ($this->hasAnyProperties($properties)) {
             // get the colliding properties
             $properties = $this->intersectProperties($properties);
             // get the property names as a human-friendly string
@@ -592,6 +604,31 @@ abstract class Entity
     } 
     
     /**
+     * Returns the diff of $properties and the entity's properties
+     *
+     * I'll return an array that contains all the elements in $properties that are
+     * not properties of the entity.
+     *
+     * @param  Jstewmc\Refraction\RefractionProperty[]|string[]  $properties  the 
+     *     properties to diff as refraction properties or string property names
+     * @return  Jstewmc\Refraction\RefractionProperty[]|string[]
+     * @since   0.1.0
+     */
+    final protected function diffProperties(Array $properties)
+    {
+        $diff = [];
+        
+        foreach ($properties as $property) {
+            if ( ! $this->hasProperty($property)) {
+                $diff[] = $property;
+            }
+        }
+        
+        return $diff;
+    }
+    
+    
+    /**
      * Returns a magic method's calling class 
      *
      * I'll return a magic method's calling class using PHP's debug_backtrace()
@@ -802,14 +839,14 @@ abstract class Entity
     }
     
     /**
-     * Returns true if the entity has one or more of the properties
+     * Returns true if the entity has *one or more* of the properties
      *
-     * @param   Jstewmc\Refraction\RefractionProperty[]  $properties  the properties 
-     *     to test
+     * @param   Jstewmc\Refraction\RefractionProperty[]|string[]  $properties  the 
+     *     properties to test as refraction objects or string property names
      * @return  bool
      * @since   0.1.0
      */
-    final protected function hasProperties(Array $properties)
+    final protected function hasAnyProperties(Array $properties)
     {
         foreach ($properties as $property) {
             if ($this->hasProperty($property)) {
@@ -821,15 +858,38 @@ abstract class Entity
     }
     
     /**
+     * Returns true if the entity has *all* of the properties
+     *
+     * @param  Jstewmc\Refraction\RefractionProperty[]|string[]  $properties  the
+     *     properties to test as refraction objects or string property names
+     * @return  bool
+     * @since   0.1.0
+     */
+    final protected function hasAllProperties(Array $properties)
+    {
+        return $properties === array_filter($properties, function ($property) {
+            return $this->hasProperty($property);
+        });
+    }
+    
+    /**
      * Returns true if the entity has the property 
      *
      * @param   Jstewmc\Refraction\RefractionProperty  $property  the property
      * @return  bool
      * @since   0.1.0
      */
-    final protected function hasProperty(RefractionProperty $property)
+    final protected function hasProperty($property)
     {
-        return in_array($property, $this->getProperties());
+        $hasProperty = false;
+        
+        if ($property instanceof RefractionProperty) {
+            $hasProperty = in_array($property, $this->getProperties());
+        } elseif (is_string($property)) {
+            $hasProperty = array_key_exists($property, $this->getProperties());
+        }
+        
+        return $hasProperty;
     }
     
     /**
