@@ -277,6 +277,7 @@ abstract class Entity
      *
      * @param   object  $object  the object to attach
      * @throws  InvalidArgumentException  if $object is not an object
+     * @throws  InvalidArgumentException  if a required method is missing
      * @throws  InvalidArgumentException  if method names collide
      * @throws  InvalidArgumentException  if property names collide
      * @return  self
@@ -292,7 +293,23 @@ abstract class Entity
         
         // if the object is an entity
         if ($object instanceof Entity) {
-            // get the entity's methods and properties
+            // the entity can get its own methods and properties, but, first, we 
+            //     need to check the entity's required methods and properties
+            //
+            // if the entity is missing a required method, short circuit
+            if ( ! $this->hasAllMethods($object->getRequiredMethods())) {
+                // get the missing methods
+                $methods = $this->diffMethods($object->getRequiredMethods());
+                // get the method names as a human-friendly string
+                $list = $this->listMethods($methods);
+                // short-circuit
+                throw new \InvalidArgumentException(
+                    "The destination entity is missing the following required "
+                        . "methods: $list"
+                );
+            }
+            
+            // otherwise, get the entity's methods and properties
             $methods    = $object->getMethods();
             $properties = $object->getProperties();
         } else {
@@ -305,7 +322,7 @@ abstract class Entity
         }
         
         // if method names collide, short-circuit
-        if ($this->hasMethods($methods)) {
+        if ($this->hasAnyMethods($methods)) {
             // get the colliding methods
             $methods = $this->intersectMethods($methods);
             // get the method names as a human-friendly string
@@ -551,6 +568,30 @@ abstract class Entity
     }
     
     /**
+     * Returns the diff of $methods and the entity's methods
+     *
+     * I'll return an array of the elements in $methods that are not methods of the
+     * entity.
+     * 
+     * @param  Jstewmc\Refraction\RefractionMethod[]|string[]  $methods  the methods
+     *     to diff as refraction objects or string method names
+     * @return  Jstewmc\Refraction\RefractionMethod[]|string[]
+     * @since   0.1.0
+     */
+    final protected function diffMethods(Array $methods)
+    {
+        $diff = [];
+        
+        foreach ($methods as $method) {
+            if ( ! $this->hasMethod($method)) {
+                $diff[] = $method;
+            }
+        }
+        
+        return $diff;
+    } 
+    
+    /**
      * Returns a magic method's calling class 
      *
      * I'll return a magic method's calling class using PHP's debug_backtrace()
@@ -708,23 +749,33 @@ abstract class Entity
     /**
      * Returns true if the entity has the method
      *
-     * @param   Jstewmc\Refraction\RefractionMethod  $method  the method
+     * @param   Jstewmc\Refraction\RefractionMethod|string  $method  the method to 
+     *     test as a refraction object or string method name
      * @return  bool
      * @since   0.1.0
      */
-    final protected function hasMethod(RefractionMethod $method)
+    final protected function hasMethod($method)
     {
-        return in_array($method, $this->getMethods());
+        $hasMethod = false;
+        
+        if ($method instanceof RefractionMethod) {
+            $hasMethod = in_array($method, $this->getMethods());
+        } elseif (is_string($method)) {
+            $hasMethod = array_key_exists($method, $this->getMethods());
+        }
+        
+        return $hasMethod;
     }
     
     /**
-     * Returns true if the entity has one or more of the methods
+     * Returns true if the entity has *one or more* of the methods
      *
-     * @param   Jstewmc\Refraction\RefractionMethod[]  $methods  the methods to test
+     * @param  Jstewmc\Refraction\RefractionMethod[]|string[]  $methods  the methods 
+     *     to test as refraction objects or string method names
      * @return  bool
      * @since   0.1.0
      */
-    final protected function hasMethods(Array $methods)
+    final protected function hasAnyMethods(Array $methods)
     {
         foreach ($methods as $method) {
             if ($this->hasMethod($method)) {
@@ -733,6 +784,21 @@ abstract class Entity
         }
         
         return false;
+    }
+    
+    /**
+     * Returns true if the entity has *all* of the methods
+     *
+     * @param   Jstewmc\Refraction\RefractionMethod[]|string[]  $methods  the methods
+     *     to test as refraction objects or string method names
+     * @return  bool
+     * @since   0.1.0
+     */
+    final protected function hasAllMethods(Array $methods)
+    {
+        return $methods === array_filter($methods, function ($method) {
+            return $this->hasMethod($method);
+        });
     }
     
     /**

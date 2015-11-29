@@ -307,6 +307,19 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !attach() */
     
     /**
+     * attach() should throw an InvalidArgumentException if a required method is missing
+     * @group  foo
+     */
+    public function test_attach_throwsInvalidArgumentException_ifRequiredMethodMissing()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        
+        (new Blank())->attach(new Required());
+        
+        return;
+    }
+    
+    /**
      * attach() should return self if source object is empty
      */
     public function test_attach_returnsSelf_ifObjectIsEmpty()
@@ -426,6 +439,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     
     /**
      * detach() should return self if object is attached
+     *
+     * @group  bar
      */
     public function test_detach_returnsSelf_ifObjectIsAttached()
     {
