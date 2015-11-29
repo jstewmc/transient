@@ -39,6 +39,14 @@ abstract class Entity
     protected static $requiredMethods = [];
     
     /**
+     * @var  string[]  an array of property names that must be present in the 
+     *     destination entity for this entity to be attached (regardless of 
+     *     visibility) (case-sensitive)
+     * @since  0.1.0
+     */
+    protected static $requiredProperties = [];
+    
+    /**
      * @var  RefractionMethod[]  the entity's transient methods, indexed by method 
      *     name
      * @since  0.1.0
@@ -64,6 +72,17 @@ abstract class Entity
     final public function getRequiredMethods()
     {
         return static::$requiredMethods;
+    }
+    
+    /**
+     * Returns the entity's required properties
+     *
+     * @return  string[]  the entity's required properties
+     * @since   0.1.0
+     */
+    final public function getRequiredProperties()
+    {
+        return static::$requiredProperties;
     }
     
     

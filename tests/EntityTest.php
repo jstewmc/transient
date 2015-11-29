@@ -502,7 +502,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !getRequiredMethods() */
     
     /**
-     * getRequiredMethods should return an array if requirements do not exist
+     * getRequiredMethods() should return an array if requirements do not exist
      */
     public function test_getRequiredMethods_returnsArray_ifRequirementsDoNotExist()
     {
@@ -510,11 +510,30 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * getRequiredMethods should return an array if requirements do exist
+     * getRequiredMethods() should return an array if requirements do exist
      */
     public function test_getRequiredMethods_returnsArray_ifRequirementsDoExist()
     {
         return $this->assertEquals(['foo'], (new Required())->getRequiredMethods());    
+    }
+    
+    
+    /* !getRequiredProperties() */
+    
+    /**
+     * getRequiredProperties() should return an array if requirements do not exist
+     */
+    public function test_getRequiredProperties_returnsArray_ifRequirementsDoNotExist()
+    {
+        return $this->assertEquals([], (new Blank())->getRequiredProperties());
+    }
+    
+    /**
+     * getRequiredProperties() should return an array if requirements do exist
+     */
+    public function test_getRequiredProperties_returnsArray_ifRequirementsDoExist()
+    {
+        return $this->assertEquals(['bar'], (new Required())->getRequiredProperties());
     }
     
     
