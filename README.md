@@ -7,8 +7,7 @@ For example:
 use Jstewmc\Transient\Entity;
 
 // let's define a simple transient entity, Foo
-// note that Foo does have a "foo" property
-// note that Foo does not have a bar() method
+// note that Foo does have a "foo" property, but it does not have a bar() method
 //
 class Foo extends Entity
 {
@@ -21,8 +20,7 @@ class Foo extends Entity
 }
 
 // and, let's define a simple class
-// note that Bar does not have a "foo" property
-// note that Bar does have a bar() method
+// note that Bar does not have a "foo" property, but it does have a bar() method
 //
 {
     public function bar()
@@ -105,8 +103,8 @@ $foo->foo;  // returns "foo"
 $foo->bar;  // returns "bar"
 $foo->baz;  // returns "baz"
 
-$bar->foo;  // throws OutOfBoundsException
-$baz->foo;  // throws OutOfBoundsException
+$bar->foo;  // throws Jstewmc\Transient\Exception\NotFound\Property
+$baz->foo;  // throws Jstewmc\Transient\Exception\NotFound\Property
 ```
 
 Once a _source_ object or entity has been attached, you can use its methods and properties as if they were defined in the _destination_ entity (i.e., the magic `$this` variable in the _source_ entity's methods will point to the _destination_ object):
@@ -133,6 +131,27 @@ $bar = new Bar();
 $foo->attach($bar);
 
 $foo->foo();  // returns 1
+```
+
+Obviously, this opens up a potential problem where the _source_ entity expects the _destination_ entity to have certain properties and methods. If it doesn't, the _source_ entity's methods will break. 
+
+If your _source_ object is an entity, you can list its required properties and methods in its `requiredProperties` and `requiredMethods` properties. If you attempt to attach a _source_ entity to a _destination_ entity and the _source_ entity's requirements are not met, a `Jstwemc\Transient\Exception\NotFound\{Properties|Methods}` will be thrown.
+
+```php
+namespace Jstewmc\Transient;
+
+class Foo extends Entity
+{
+    protected $foo;
+}
+
+class Bar extends Entity
+{
+    protected static $requiredProperties = 'bar';   
+}
+
+$foo = new Foo();
+$foo->attach($bar);  // throws Exception\NotFound\Properties
 ```
 
 When you're done, you can detach the _source_ object from the _destination_ entity:
@@ -174,45 +193,35 @@ Of course, this library isn't perfect. There are limitations like unique names, 
 
 ### Unique names
 
-You MUST use unique property and method names. You cannot attach a _source_ object to a _destination_ entity if the two objects have a method or property name in common. Otherwise, an `InvalidArgumentException` will be thrown.
+You MUST use unique property and method names. You cannot attach a _source_ object to a _destination_ entity if the two objects have a method or property name in common. Otherwise, an `Exception\Redeclaration\Methods` or `Exception\Redeclaration\Properties` will be thrown.
 
 For example, the following code _will not work_:
 
 ```php
-use Jstewmc\Transient\Entity;
+namespace Jstewmc\Transient;
 
 class Foo1 extends Entity
 {
     protected $foo;
-    
-    public function foo()
-    {
-        return;
-    }
 }
 
 class Foo2 extends Entity
 {
     protected $foo;
-    
-    public function foo()
-    {
-        return;
-    }
 }
 
 $foo1 = new Foo1();
 $foo2 = new Foo2();
 
 // this will NOT work, because the method and property names collide
-// this will throw an InvalidArgumentException!
+// this will throw an Exception\Redeclaration\Properties!
 //
 $foo1->attach($foo2);
 ```
 
 ### Reserved names
 
-You MUST NOT override the `Entity` base property and method names. Otherwise, your entity will probably malfunction, or at the very least, give you wacky results.
+Except for the `requiredProperties` and `requiredMethods` properties, you MUST NOT override the `Entity` base property and method names. Otherwise, your entity will probably malfunction, or at the very least, give you wacky results.
 
 I've tried to disallow overriding the base methods where I can with the `final` keyword, but, just to be safe, you should treat the following property and method names as reserved:
 
@@ -285,7 +294,8 @@ That's about it! This is the first version. Of course, I'm sure I missed somethi
 Here are a few improvements I'm thinking about:
 
 * ~~Do you have to attach an Entity? Why not just allow the programmer to attach an entity or a vanilla object?~~ (Done!)
-* We should allow a _source_ entity to define requirements, like an interface it expects the _destination_ entity to implement at a minimum.
+* ~~We should allow a _source_ entity to define requirements, like an interface it expects the _destination_ entity to implement at a minimum.~~
+* We should allow a calling class to defined requirements, like an interface that the entity, in its current state, must implement.
 
 
 ## About
@@ -312,7 +322,14 @@ That's why I built the Transient library. With Transient, you can attach objects
 
 ## Version
 
-### dev-mater - November 28, 2015
+### dev-master - November 29, 2015
+
+* Add `requiredProperties` and `requiredMethods` properties.
+* Add custom exceptions like `NotFound\Property`, `NotFound\Properties`, etc.
+* Fix test classes (ugh, can't wait for PHP7's anonymous classes).
+* Fix a few bugs.
+
+### dev-master - November 28, 2015
 
 * Updated `attach()` and `detach()` to accept any object, not just entities.
 
