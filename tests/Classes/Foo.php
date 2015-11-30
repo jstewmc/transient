@@ -1,12 +1,12 @@
 <?php
 /**
- * The file for the Foo class
+ * The file for the foo test class
  *
  * @author     Jack Clayton <clayjs0@gmail.com>
  * @copyright  2015 Jack Clayton
  * @license    MIT
  */
-namespace Jstewmc\Transient\Tests;
+namespace Jstewmc\Transient\Tests\Classes;
 
 /**
  * A Foo test class

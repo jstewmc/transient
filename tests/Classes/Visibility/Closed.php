@@ -1,15 +1,17 @@
 <?php
 /**
- * The file for the Qux class
+ * The file for the closed visiblity class
  *
  * @author     Jack Clayton <clayjs0@gmail.com>
  * @copyright  2015 Jack Clayton
  * @license    MIT
  */
-namespace Jstewmc\Transient\Tests;
+namespace Jstewmc\Transient\Tests\Classes\Visibility;
 
 /**
- * A "closed" test class
+ * A closed test class
+ *
+ * A closed test class has private or protected properties and methods.
  *
  * @since  0.1.0
  */

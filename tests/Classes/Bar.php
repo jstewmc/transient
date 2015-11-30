@@ -6,7 +6,7 @@
  * @copyright  2015 Jack Clayton
  * @license    MIT
  */
-namespace Jstewmc\Transient\Tests;
+namespace Jstewmc\Transient\Tests\Classes;
 
 /**
  * A Bar test class

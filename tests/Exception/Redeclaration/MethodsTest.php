@@ -11,7 +11,7 @@ namespace Jstewmc\Transient\Exception\Redeclaration;
 
 use Jstewmc\Refraction\RefractionMethod;
 
-use Jstewmc\Transient\Tests\Foo;
+use Jstewmc\Transient\Tests\Classes\Foo;
 
 /**
  * The methods redeclaration exception test class
@@ -39,8 +39,8 @@ class MethodsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($methods, $e->getMethods());
         $this->assertEquals(
             'Cannot redeclare the following methods: '
-                . 'Jstewmc\Transient\Tests\Foo::getFoo() and '
-                . 'Jstewmc\Transient\Tests\Foo::setFoo()',
+                . 'Jstewmc\Transient\Tests\Classes\Foo::getFoo() and '
+                . 'Jstewmc\Transient\Tests\Classes\Foo::setFoo()',
             $e->getMessage()
         );
         

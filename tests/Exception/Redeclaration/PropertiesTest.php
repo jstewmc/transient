@@ -11,7 +11,7 @@ namespace Jstewmc\Transient\Exception\Redeclaration;
 
 use Jstewmc\Refraction\RefractionProperty;
 
-use Jstewmc\Transient\Tests\Foo;
+use Jstewmc\Transient\Tests\Classes\Foo;
 
 /**
  * The properties redeclaration exception test class
@@ -36,7 +36,7 @@ class PropertiesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($properties, $e->getProperties());
         $this->assertEquals(
             'Cannot redeclare the following properties: '
-                . 'Jstewmc\Transient\Tests\Foo::foo',
+                . 'Jstewmc\Transient\Tests\Classes\Foo::foo',
             $e->getMessage()
         );
         

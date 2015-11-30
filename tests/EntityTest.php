@@ -9,23 +9,12 @@
 
 namespace Jstewmc\Transient;
 
-use Jstewmc\Transient\Tests\Foo;
-use Jstewmc\Transient\Tests\Bar; 
-use Jstewmc\Transient\Tests\Baz;
-
-use Jstewmc\Transient\Tests\Blank;     // a class with no properties/methods
-use Jstewmc\Transient\Tests\Closed;    // a class with protected properties/methods
-use Jstewmc\Transient\Tests\Open;      // a class with public properties/methods
-use Jstewmc\Transient\Tests\Required;  // a class with required properties/methods
-
-use Jstewmc\Transient\Tests\FooDefinedMethod;
-use Jstewmc\Transient\Tests\FooDefinedProperty;
-use Jstewmc\Transient\Tests\FooUndefinedMethod; 
-use Jstewmc\Transient\Tests\FooUndefinedProperty;
-
 use Jstewmc\Refraction\RefractionClass;
 use Jstewmc\Refraction\RefractionMethod;
 use Jstewmc\Refraction\RefractionProperty;
+
+// use a bunch of classes that I wish I could anonymously define!
+use Jstewmc\Transient\Tests\Classes;
 
 
 /**
@@ -44,7 +33,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Method');
         
-        (new Blank())->foo();
+        // the blank class doesn't have a foo() method
+        (new Classes\Blank())->foo();
         
         return;
     }
@@ -56,7 +46,14 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Method');
         
-        (new Foo())->attach(new Closed())->getClosed();
+        // instantiate a Foo entity
+        $foo = new Classes\Foo();
+        
+        // attach a Closed entity
+        $foo->attach(new Classes\Visibility\Closed());
+        
+        // the closed entity does have a getClosed() method, but it's protected
+        $foo->getClosed();
         
         return;
     }
@@ -66,9 +63,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___call_returnsResult_ifMethodIsVisible()
     {
-        $foo = new Foo();
-        $bar = new Bar();
-        $baz = new Baz();
+        $foo = new Classes\Foo();
+        $bar = new Classes\Bar();
+        $baz = new Classes\Baz();
         
         $bar->attach($baz);
         $foo->attach($bar);
@@ -95,7 +92,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
-        (new Blank())->foo;
+        // the blank class doesn't have a 'foo' property
+        (new Classes\Blank())->foo;
         
         return;
     }
@@ -107,10 +105,14 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
-        // the "foo" property of the Foo class is protected
-        // it should not be visible to the EntityTest class
-        //
-        (new Foo())->foo;
+        // instantiate a foo entity
+        $foo = new Classes\Foo();
+        
+        // attach a Closed entity
+        $foo->attach(new Classes\Visibility\Closed());
+        
+        // the Closed entity has a 'closed' property but it's protected
+        $foo->closed;
         
         return;
     }
@@ -120,11 +122,13 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___get_returnsValue_ifPropertyIsVisible()
     {
-        $foo  = new Foo();
-        $open = new Open();
+        // instantiate a new Foo entity
+        $foo = new Classes\Foo();
         
-        $foo->attach($open);
+        // attach an Open entity
+        $foo->attach(new Classes\Visibility\Open());
         
+        // the Open entity has a public 'open' property, and it's value is 'open'
         $this->assertEquals('open', $foo->open);
         
         return;
@@ -139,8 +143,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___isset_returnsFalse_ifPropertyDoesNotExist()
     {
-        $blank = new Blank();
-        
+        $blank = new Classes\Blank();
+     
+        // the Blank class doesn't have a "foo" property   
         $this->assertFalse(isset($blank->foo));
         
         return;
@@ -151,13 +156,14 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___isset_returnsFalse_ifPropertyIsNotVisible()
     {
-        $foo = new Foo();
-        $bar = new Bar();
+        // instantiate a new Foo entity
+        $foo = new Classes\Foo();
         
-        $foo->attach($bar);
+        // attach a Closed entity
+        $foo->attach(new Classes\Visibility\Closed());
         
-        // bar is a protected property of the Bar object
-        $this->assertFalse(isset($foo->bar));
+        // the Closed class has a "closed" property but it's protected
+        $this->assertFalse(isset($foo->closed));
         
         return;
     }
@@ -167,14 +173,13 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___isset_returnsFalse_ifPropertyIsNull()
     {
-        $foo  = new Foo();
-        $open = new Open();
+        // instantiate a new Foo entity
+        $foo = new Classes\Foo();
         
-        $foo->attach($open);
+        // attach a Set entity
+        $foo->attach(new Classes\Set\Set());
         
-        // "null" is a public property of the Open class that has a null value
-        // keep in mind, $foo->null would raise a syntax error
-        //
+        // the Set class has "null" property with a null value
         $this->assertFalse(isset($foo->{"null"}));
         
         return;
@@ -185,13 +190,14 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___isset_returnsTrue_ifPropertyIsNotNull()
     {
-        $foo  = new Foo();
-        $open = new Open();
+        // instantiate a new Foo entity
+        $foo = new Classes\Foo();
         
-        $foo->attach($open);
+        // attach a new Set entity
+        $foo->attach(new Classes\Set\Set());
         
-        // "open" is a public property of the Open class that has a string value
-        $this->assertTrue(isset($foo->open));
+        // the Set class has a "notNull" property with a not null value
+        $this->assertTrue(isset($foo->notNull));
         
         return;
     }
@@ -206,7 +212,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
-        $blank = new Blank();
+        $blank = new Classes\Blank();
         
         $blank->foo = 'foo';
         
@@ -220,9 +226,14 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
-        $foo = new Foo();
+        // instantiate a new Foo entity
+        $foo = new Classes\Foo();
         
-        $foo->foo = 'bar';
+        // attach a Closed entity
+        $foo->attach(new Classes\Visibility\Closed());
+        
+        // the Closed entity has a "closed" property, but it's protected
+        $foo->closed = 'foo';
         
         return;
     }
@@ -233,11 +244,13 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___set_returnsNull_ifPropertyIsVisible()
     {
-        $foo  = new Foo();
-        $open = new Open();
+        // instantiate a new Foo entity
+        $foo = new Classes\Foo();
         
-        $foo->attach($open);
+        // attach an Open entity
+        $foo->attach(new Classes\Visibility\Open());
         
+        // the Open entity has an "open" property that's public
         $this->assertEquals('open', $foo->open);
         
         $foo->open = 'foo';
@@ -295,12 +308,15 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test___unset_returnsNull_ifPropertyIsVisible()
     {
-        $foo  = new Foo();
-        $open = new Open();
+        // instantiate a new Foo entity
+        $foo = new Classes\Foo();
         
-        $foo->attach($open);
+        // attach an Open entity
+        $foo->attach(new Classes\Visibility\Open());
         
-        // the "open" property's default value is the string "open"
+        // the Open entity has a public "open" property
+        $this->assertEquals('open', $foo->open);
+        
         unset($foo->open);
         
         $this->assertNull($foo->open);
@@ -319,7 +335,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Methods');
         
-        (new Foo())->attach(new FooUndefinedMethod());
+        // the MethodNotFound entity requires a "qux" method
+        (new Classes\Foo())->attach(new Classes\Error\MethodNotFound());
         
         return;
     }
@@ -332,7 +349,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Properties');
         
-        (new Foo())->attach(new FooUndefinedProperty());
+        // the PropertyNotFound entity requires a "qux" property
+        (new Classes\Foo())->attach(new Classes\Error\PropertyNotFound());
         
         return;
     }
@@ -345,7 +363,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Methods');
         
-        (new Foo())->attach(new FooDefinedMethod());
+        // the MethodRedeclaration entity redeclares the getFoo() method
+        (new Classes\Foo())->attach(new Classes\Error\MethodRedeclaration());
         
         return;
     }
@@ -358,7 +377,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Properties');
         
-        (new Foo())->attach(new FooDefinedProperty());
+        // the PropertyRedeclaration entity redeclares the foo property
+        (new Classes\Foo())->attach(new Classes\Error\PropertyRedeclaration());
      
         return;
     }
@@ -368,8 +388,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_attach_returnsSelf_ifObjectIsEmpty()
     {
-        $foo   = new Foo();
-        $blank = new Blank();
+        $foo   = new Classes\Foo();
+        $blank = new Classes\Blank();
         
         $this->assertSame($foo, $foo->attach($blank));
         
@@ -396,8 +416,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_attach_returnsSelf_ifObjectIsNotEmpty()
     {
-        $foo = new Foo();
-        $bar = new Bar();
+        $foo = new Classes\Foo();
+        $bar = new Classes\Bar();
         
         $this->assertSame($foo, $foo->attach($bar));
         
@@ -430,8 +450,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_detach_returnsSelf_ifObjectIsEmpty()
     {
-        $foo   = new Foo();
-        $blank = new Blank();
+        $foo   = new Classes\Foo();
+        $blank = new Classes\Blank();
         
         $this->assertSame($foo, $foo->detach($blank));
         
@@ -458,8 +478,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_detach_returnsSelf_ifObjectIsNotAttached()
     {
-        $foo = new Foo();
-        $bar = new Bar();
+        $foo = new Classes\Foo();
+        $bar = new Classes\Bar();
         
         $this->assertSame($foo, $foo->detach($bar));
         
@@ -486,8 +506,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_detach_returnsSelf_ifObjectIsAttached()
     {
-        $foo = new Foo();
-        $bar = new Bar();
+        $foo = new Classes\Foo();
+        $bar = new Classes\Bar();
         
         $foo->attach($bar);
         
@@ -519,7 +539,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getMethods_returnsArray_ifMethodsDoNotExist()
     {
-        return $this->assertEquals([], (new Blank())->getMethods());
+        return $this->assertEquals([], (new Classes\Blank())->getMethods());
     
     }
     
@@ -529,9 +549,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     public function test_getMethods_returnsArray_ifMethodsDoExist()
     {
         // create a new Foo, Bar, and Baz
-        $foo = new Foo();
-        $bar = new Bar();
-        $baz = new Baz();
+        $foo = new Classes\Foo();
+        $bar = new Classes\Bar();
+        $baz = new Classes\Baz();
         
         // attach baz to bar and attach bar to foo
         $bar->attach($baz);
@@ -563,7 +583,10 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getRequiredMethods_returnsArray_ifRequirementsDoNotExist()
     {
-        return $this->assertEquals([], (new Blank())->getRequiredMethods());
+        return $this->assertEquals(
+            [], 
+            (new Classes\Blank())->getRequiredMethods()
+        );
     }
     
     /**
@@ -571,7 +594,10 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getRequiredMethods_returnsArray_ifRequirementsDoExist()
     {
-        return $this->assertEquals(['bar'], (new FooUndefinedMethod())->getRequiredMethods());    
+        return $this->assertEquals(
+            ['requiredMethod'], 
+            (new Classes\Required\Method())->getRequiredMethods()
+        );    
     }
     
     
@@ -582,7 +608,10 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getRequiredProperties_returnsArray_ifRequirementsDoNotExist()
     {
-        return $this->assertEquals([], (new Blank())->getRequiredProperties());
+        return $this->assertEquals(
+            [], 
+            (new Classes\Blank())->getRequiredProperties()
+        );
     }
     
     /**
@@ -590,7 +619,10 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getRequiredProperties_returnsArray_ifRequirementsDoExist()
     {
-        return $this->assertEquals(['bar'], (new FooUndefinedProperty())->getRequiredProperties());
+        return $this->assertEquals(
+            ['requiredProperty'], 
+            (new Classes\Required\Property())->getRequiredProperties()
+        );
     }
     
     
@@ -601,7 +633,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getProperties_returnsArray_ifPropertiesDoNotExist()
     {
-        return $this->assertEquals([], (new Blank())->getProperties());
+        return $this->assertEquals([], (new Classes\Blank())->getProperties());
     }
     
     /**
@@ -610,9 +642,9 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     public function test_getProperties_returnsArray_ifPropertiesDoExist()
     {
         // create a new Foo, Bar, and Baz
-        $foo = new Foo();
-        $bar = new Bar();
-        $baz = new Baz();
+        $foo = new Classes\Foo();
+        $bar = new Classes\Bar();
+        $baz = new Classes\Baz();
         
         // attach baz to bar and bar to foo
         $bar->attach($baz);
