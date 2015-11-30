@@ -94,18 +94,17 @@ abstract class Entity
      * @param   string   $name       the method's name
      * @param   mixed[]  $arguments  the method's arguments
      * @return  mixed
-     * @throws  BadMethodCallException  if method does not exist
-     * @throws  BadMethodCallException  if method is not visible to calling class
+     * @throws  Jstewmc\Transient\Exception\NotFound\Method  if the method does not
+     *     exist
+     * @throws  Jstewmc\Transient\Exception\NotFound\Method  if the method does exist
+     *     but is not visible to the calling class
      * @since   0.1.0
      */
     public function __call($name, $arguments)
     {
         // if the transient method does not exist, short-circuit
         if ( ! array_key_exists($name, $this->transientMethods)) {
-            throw new \BadMethodCallException(
-                "Method $name() does not exist, neither as a defined method nor as "
-                    . "a transient method"
-            );
+            throw new Exception\NotFound\Method($name);
         }
         
         // get the transient method
@@ -116,10 +115,7 @@ abstract class Entity
         
         // if the method is not visible to the class, short-circuit
         if ( ! $this->isMethodVisible($method, $class)) {
-            throw new \BadMethodCallException(
-                "Method $name() does exists, but it is not visible to the calling "
-                    . "class, ".get_class($class)
-            );
+            throw new Exception\NotFound\Method($name);
         }
        
         // otherwise, get the method as a closure
@@ -139,18 +135,17 @@ abstract class Entity
      *
      * @param   string  $name  the property's name
      * @return  mixed
-     * @throws  OutOfBoundsException  if the property does not exist
-     * @throws  OutOfBoundsException  if the property is not visible to calling class
+     * @throws  Jstewmc\Transient\Exception\NotFound\Property  if the property does
+     *     not exist
+     * @throws  Jstewmc\Transient\Exception\NotFound\Property  if the property does 
+     *     exist but is not visible to the calling class
      * @since   0.1.0
      */
     public function __get($name)
     {
         // if the transient property does not exist, short-circuit
         if ( ! array_key_exists($name, $this->transientProperties)) {
-            throw new \OutOfBoundsException(
-                "Property '$name' does not exist, neither as a defined property nor "
-                    . "as a transient property"
-            );
+            throw new Exception\NotFound\Property($name);
         }
         
         // get the property
@@ -161,10 +156,7 @@ abstract class Entity
         
         // if the property is not visible to the calling class, short-circuit
         if ( ! $this->isPropertyVisible($property, $class)) {
-            throw new \OutOfBoundsException(
-                "Property '$name' does exist, but it is not visible to the calling "
-                    . "class, ".get_class($class)
-            );
+            throw new Exception\NotFound\Property($name);
         }
         
         // otherwise, get the property's value
@@ -209,16 +201,17 @@ abstract class Entity
      * @param   string  $name   the property's name
      * @param   mixed   $value  the property's value
      * @return  void
+     * @throws  Jstewmc\Transient\Exception\NotFound\Property  if the property does
+     *     not exist
+     * @throws  Jstewmc\Transient\Exception\NotFound\Property  if the property does
+     *     exist but is not visible to the calling class
      * @since   0.1.0
      */
     public function __set($name, $value)
     {
         // if the transient property does not exist, short-circuit
         if ( ! array_key_exists($name, $this->transientProperties)) {
-            throw new \OutOfBoundsException(
-                "Property '$name' does not exist, neither as a defined property nor "
-                    . "as a transient property"
-            );
+            throw new Exception\NotFound\Property($name);
         }
         
         // get the property
@@ -229,10 +222,7 @@ abstract class Entity
         
         // if the property is not visible to the calling class, short-circuit
         if ( ! $this->isPropertyVisible($property, $class)) {
-            throw new \OutOfBoundsException(
-                "Property '$name' does exist, but it is not visible to the calling "
-                    . "class, ".get_class($class)
-            );
+            throw new Exception\NotFound\Property($name);
         }
         
         // otherwise, set the property's value
@@ -277,9 +267,17 @@ abstract class Entity
      *
      * @param   object  $object  the object to attach
      * @throws  InvalidArgumentException  if $object is not an object
-     * @throws  InvalidArgumentException  if a required method is missing
-     * @throws  InvalidArgumentException  if method names collide
-     * @throws  InvalidArgumentException  if property names collide
+     * @throws  Jstewmc\Transient\Exception\NotFound\Methods  if $object is an 
+     *     entity and this entity is missing one or more of $object's required
+     *     methods
+     * @throws  Jstewmc\Transient\Exception\NotFound\Properties  if $object is an
+     *     entity and this entity is missing one or more of $object's required
+     *     properties
+     * @throws  Jstewmc\Transient\Exception\Redeclaration\Methods  if $object is an 
+     *     entity and this entity has one or more methods in common with $object
+     * @throws  Jstewmc\Transient\Exception\Redeclaration\Properties  if $object is
+     *     an entity and this entity has one or more properties in common with 
+     *     $object
      * @return  self
      * @since   0.1.0
      */
@@ -293,31 +291,20 @@ abstract class Entity
         
         // if the object is an entity
         if ($object instanceof Entity) {
-            // the entity can get its own methods and properties, but, first, we 
-            //     need to check the entity's required methods and properties
+            // the entity can get its own methods and properties, but we need to 
+            //     check the entity's required methods and properties (if they exist)
             //
             // if the entity is missing a required method, short circuit
             if ( ! $this->hasAllMethods($object->getRequiredMethods())) {
-                // get the missing methods
-                $methods = $this->diffMethods($object->getRequiredMethods());
-                // get the method names as a human-friendly string
-                $list = $this->listMethods($methods);
-                // short-circuit
-                throw new \InvalidArgumentException(
-                    "The destination entity is missing the following required "
-                        . "methods: $list"
+                throw new Exception\NotFound\Methods(
+                    $this->diffMethods($object->getRequiredMethods())
                 );
             }
             
             // if the entity is missing a required property, short-circuit
             if ( ! $this->hasAllProperties($object->getRequiredProperties())) {
-                // get the missing properties
-                $properties = $this->diffProperties($object->getRequiredProperties());
-                // get the property names as a human-friendly string
-                $list = $this->listProperties($properties);
-                // short-circuit
-                throw new \InvalidArgumentException(
-                    "The entity is missing the following required properties: $list"
+                throw new Exception\NotFound\Properties(
+                    $this->diffProperties($object->getRequiredProperties())
                 );
             }
             
@@ -335,27 +322,15 @@ abstract class Entity
         
         // if method names collide, short-circuit
         if ($this->hasAnyMethods($methods)) {
-            // get the colliding methods
-            $methods = $this->intersectMethods($methods);
-            // get the method names as a human-friendly string
-            $list = $this->listMethods($methods);
-            // short-circuit
-            throw new \InvalidArgumentException(
-                __METHOD__."() expects method names to be unique, but the following "
-                    . "methods already exist: $list"
+            throw new Exception\Redeclaration\Methods(
+                $this->intersectMethods($methods)
             );
         }
         
         // if property names collide, short-circuit
         if ($this->hasAnyProperties($properties)) {
-            // get the colliding properties
-            $properties = $this->intersectProperties($properties);
-            // get the property names as a human-friendly string
-            $list = $this->listProperties($properties);
-            // short-circuit
-            throw new \InvalidArgumentException(
-                __METHOD__."() expects property names to be unique, but the "
-                    . "following properties already exist: $list"
+            throw new Exception\Redeclaration\Properties(
+                $this->intersectProperties($properties)
             );
         }
         
@@ -709,56 +684,6 @@ abstract class Entity
        }
        
        return $properties;
-    }
-    
-    /**
-     * Lists method names as a human-friendly string (e.g., "foo() and bar()")
-     *
-     * @param  Jstewmc\Refraction\RefractionMethod[]  $methods  the methods to list,
-     *     indexed by name
-     * @return  string
-     * @since   0.1.0
-     */
-    final protected function listMethods(Array $methods)
-    {
-        $list = '';
-        
-        $names = array_keys($methods);
-        
-        if (count($names) === 1) {
-            $list = $names[0].'()';
-        } elseif (count($names) === 2) {
-            $list = $names[0].'() and '.$names[1].'()';
-        } else {
-            $list = implode('(), ', $names).'()';
-        }
-        
-        return $list;
-    }
-    
-    /**
-     * Lists property names as a human-friendly string (e.g., "'foo' and 'bar'")
-     *
-     * @param  Jstewmc\Refraction\RefractionProperty[]  $properties  the properties
-     *     to list, indexed by name
-     * @return  string
-     * @sicnce  0.1.0
-     */
-    final protected function listProperties(Array $properties)
-    {
-        $list = '';
-        
-        $names = array_keys($properties);
-        
-        if (count($names) === 1) {
-            $list = '\''.$names[0].'\'';
-        } elseif (count($names) === 2) {
-            $list = '\''.$names[0].'\' and \''.$names[1].'\'';
-        } else {
-            $list = '\''.implode('\', \'', $names).'\'';
-        }
-        
-        return $list;
     }
     
     /**

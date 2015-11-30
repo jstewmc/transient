@@ -18,8 +18,10 @@ use Jstewmc\Transient\Tests\Closed;    // a class with protected properties/meth
 use Jstewmc\Transient\Tests\Open;      // a class with public properties/methods
 use Jstewmc\Transient\Tests\Required;  // a class with required properties/methods
 
-use Jstewmc\Transient\Tests\FooPropertyCollision;
-use Jstewmc\Transient\Tests\FooMethodCollision;
+use Jstewmc\Transient\Tests\FooDefinedMethod;
+use Jstewmc\Transient\Tests\FooDefinedProperty;
+use Jstewmc\Transient\Tests\FooUndefinedMethod; 
+use Jstewmc\Transient\Tests\FooUndefinedProperty;
 
 use Jstewmc\Refraction\RefractionClass;
 use Jstewmc\Refraction\RefractionMethod;
@@ -36,11 +38,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !__call() */
     
     /**
-     * __call() should throw a BadMethodCallException if method does not exist
+     * __call() should throw a method not found exception if method does not exist
      */
-    public function test___call_throwsBadMethodCallException_ifMethodDoesNotExist()
+    public function test___call_throwsMethodNotFoundException_ifMethodDoesNotExist()
     {
-        $this->setExpectedException('BadMethodCallException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Method');
         
         (new Blank())->foo();
         
@@ -48,11 +50,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * __call() should throw a BadMethodCallException if method is not visible
+     * __call() should throw a method not found exception if method is not visible
      */
-    public function test___call_throwsBadMethodCallException_ifMethodIsNotVisible()
+    public function test___call_throwsMethodNotFoundException_ifMethodIsNotVisible()
     {
-        $this->setExpectedException('BadMethodCallException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Method');
         
         (new Foo())->attach(new Closed())->getClosed();
         
@@ -87,11 +89,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !__get() */
     
     /**
-     * __get() should throw OutOfBoundsException if property does not exist
+     * __get() should throw property not found exception if property does not exist
      */
-    public function test___get_throwsOutOfBoundsException_ifPropertyDoesNotExist()
+    public function test___get_throwsPropertyNotFoundException_ifPropertyDoesNotExist()
     {
-        $this->setExpectedException('OutOfBoundsException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
         (new Blank())->foo;
         
@@ -99,11 +101,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * __get() should throw OutOfBoundsException if property is not visible
+     * __get() should throw property not found exception if property is not visible
      */
-    public function test___get_throwsOutOfBoundsException_ifPropertyIsNotVisible()
+    public function test___get_throwsPropertyNotFoundException_ifPropertyIsNotVisible()
     {
-        $this->setExpectedException('OutOfBoundsException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
         // the "foo" property of the Foo class is protected
         // it should not be visible to the EntityTest class
@@ -198,11 +200,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !__set() */
     
     /**
-     * __set() should throw OutOfBoundsException if the property does not exist
+     * __set() should throw property not found exception if the property does not exist
      */
-    public function test___set_throwsOutOfBoundsException_ifPropertyDoesNotExist()
+    public function test___set_throwsPropertyNotFoundException_ifPropertyDoesNotExist()
     {
-        $this->setExpectedException('OutOfBoundsException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
         $blank = new Blank();
         
@@ -212,11 +214,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * __set() should throw OutOfBoundsException if the property is not visible
+     * __set() should throw property not found exception if the property is not visible
      */
-    public function test___set_throwsOutOfBoundsException_ifPropertyIsNotVisible()
+    public function test___set_throwsPropertyNotFoundException_ifPropertyIsNotVisible()
     {
-        $this->setExpectedException('OutOfBoundsException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
         $foo = new Foo();
         
@@ -310,55 +312,54 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /* !attach() */
     
     /**
-     * attach() should throw an InvalidArgumentException if a required method is 
-     *     missing
+     * attach() should throw a method not found exception if a required method does
+     *     not exist
      */
-    public function test_attach_throwsInvalidArgumentException_ifRequiredMethodMissing()
+    public function test_attach_throwsMethodNotFoundException_ifRequiredMethodMissing()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Methods');
         
-        (new Blank())->attach(new Required());
+        (new Foo())->attach(new FooUndefinedMethod());
         
         return;
     }
     
     /**
-     * attach() should throw an InvalidArgumentException if a required property is 
-     *     missing
+     * attach() should throw a property not found exception if a required property
+     *     does not exist
      */
-    public function test_attach_throwsInvalidArgumentException_ifRequiredPropertyMissing()
+    public function test_attach_throwsPropertyNotFoundException_ifRequiredPropertyMissing()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Properties');
         
-        (new Blank())->attach(new Required());
+        (new Foo())->attach(new FooUndefinedProperty());
         
         return;
     }
     
     /**
-     * attach() should throw an InvalidArgumentException if one or more properties
+     * attach() should throw a method redeclaration exception if one or more methods 
      *     collide
-     * @group  foo
      */
-    public function test_attach_throwsInvalidArgumentException_ifPropertiesCollide()
+    public function test_attach_throwsMethodRedeclarationException_ifMethodsCollide()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Methods');
         
-        (new Foo())->attach(new FooPropertyCollision());
+        (new Foo())->attach(new FooDefinedMethod());
+        
+        return;
+    }
+    
+    /**
+     * attach() should throw a property redeclaration exception if one or more 
+     *     properties collide
+     */
+    public function test_attach_throwsPropertyRedeclarationException_ifPropertiesCollide()
+    {
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Properties');
+        
+        (new Foo())->attach(new FooDefinedProperty());
      
-        return;
-    }
-    
-    /**
-     * attach() should throw an InvalidArgumentException if one or more methods 
-     *     collide
-     */
-    public function test_attach_throwsInvalidArgumentException_ifMethodsCollide()
-    {
-        $this->setExpectedException('InvalidArgumentException');
-        
-        (new Foo())->attach(new FooMethodCollision());
-        
         return;
     }
     
@@ -482,8 +483,6 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     
     /**
      * detach() should return self if object is attached
-     *
-     * @group  bar
      */
     public function test_detach_returnsSelf_ifObjectIsAttached()
     {
@@ -572,7 +571,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getRequiredMethods_returnsArray_ifRequirementsDoExist()
     {
-        return $this->assertEquals(['foo'], (new Required())->getRequiredMethods());    
+        return $this->assertEquals(['bar'], (new FooUndefinedMethod())->getRequiredMethods());    
     }
     
     
@@ -591,7 +590,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getRequiredProperties_returnsArray_ifRequirementsDoExist()
     {
-        return $this->assertEquals(['bar'], (new Required())->getRequiredProperties());
+        return $this->assertEquals(['bar'], (new FooUndefinedProperty())->getRequiredProperties());
     }
     
     

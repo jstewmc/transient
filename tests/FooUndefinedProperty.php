@@ -1,6 +1,6 @@
 <?php
 /**
- * The file for the Required class
+ * The file for the FooUndefinedProperty class
  *
  * @author     Jack Clayton <clayjs0@gmail.com>
  * @copyright  2015 Jack Clayton
@@ -9,13 +9,11 @@
 namespace Jstewmc\Transient\Tests;
 
 /**
- * A Required test class
+ * A FooUndefinedProperty test class
  *
  * @since  0.1.0
  */
-class Required extends \Jstewmc\Transient\Entity
+class FooUndefinedProperty extends \Jstewmc\Transient\Entity
 {
-    protected static $requiredMethods = ['foo'];
-    
     protected static $requiredProperties = ['bar'];
 }

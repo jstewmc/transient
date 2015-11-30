@@ -1,6 +1,6 @@
 <?php
 /**
- * The file for the FooMethodCollision class
+ * The file for the FooDefinedMethod class
  *
  * @author     Jack Clayton <clayjs0@gmail.com>
  * @copyright  2015 Jack Clayton
@@ -9,11 +9,11 @@
 namespace Jstewmc\Transient\Tests;
 
 /**
- * A FooMethodCollision test class
+ * A FooDefinedMethod test class
  *
  * @since  0.1.0
  */
-class FooMethodCollision extends \Jstewmc\Transient\Entity
+class FooDefinedMethod extends \Jstewmc\Transient\Entity
 {
     public function getFoo()
     {
