@@ -296,6 +296,8 @@ Here are a few improvements I'm thinking about:
 * ~~Do you have to attach an Entity? Why not just allow the programmer to attach an entity or a vanilla object?~~ (Done!)
 * ~~We should allow a _source_ entity to define requirements, like an interface it expects the _destination_ entity to implement at a minimum.~~
 * We should allow a calling class to defined requirements, like an interface that the entity, in its current state, must implement.
+* I should consolidate the `Exception\NotFound\Methods` and `Exception\NotFound\Method` as well as the `Exception\NotFound\Properties` and `Exception\NotFound\Property` exception classes. They basically do the same thing, and the difference is confusing.
+* Then, I should rename the `Exception\Redeclaration\Methods` and `Exception\Redeclaration\Properties` to the singular form.
 
 
 ## About
