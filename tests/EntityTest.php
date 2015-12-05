@@ -333,7 +333,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_attach_throwsMethodNotFoundException_ifRequiredMethodMissing()
     {
-        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Methods');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Method');
         
         // the MethodNotFound entity requires a "qux" method
         (new Classes\Foo())->attach(new Classes\Error\MethodNotFound());

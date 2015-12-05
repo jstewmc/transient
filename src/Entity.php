@@ -296,7 +296,7 @@ abstract class Entity
             //
             // if the entity is missing a required method, short circuit
             if ( ! $this->hasAllMethods($object->getRequiredMethods())) {
-                throw new Exception\NotFound\Methods(
+                throw new Exception\NotFound\Method(
                     $this->diffMethods($object->getRequiredMethods())
                 );
             }
