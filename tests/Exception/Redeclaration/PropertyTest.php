@@ -1,6 +1,6 @@
 <?php
 /**
- * The file for the properties redeclaration exception test class
+ * The file for the property redeclaration exception test class
  *
  * @author     Jack Clayton <clayjs0@gmail.com>
  * @copyright  2015 Jack Clayton
@@ -14,11 +14,11 @@ use Jstewmc\Refraction\RefractionProperty;
 use Jstewmc\Transient\Tests\Classes\Foo;
 
 /**
- * The properties redeclaration exception test class
+ * The property redeclaration exception test class
  *
  * @since  0.1.0
  */
-class PropertiesTest extends \PHPUnit_Framework_TestCase
+class PropertyTest extends \PHPUnit_Framework_TestCase
 {
     /* !__construct() */
     
@@ -31,7 +31,7 @@ class PropertiesTest extends \PHPUnit_Framework_TestCase
         
         $properties = [new RefractionProperty($foo, 'foo')];
         
-        $e = new Properties($properties);
+        $e = new Property($properties);
         
         $this->assertSame($properties, $e->getProperties());
         $this->assertEquals(
@@ -55,10 +55,7 @@ class PropertiesTest extends \PHPUnit_Framework_TestCase
         
         $properties = [new RefractionProperty($foo, 'foo')];
         
-        $this->assertSame(
-            $properties, 
-            (new Properties($properties))->getProperties()
-        );
+        $this->assertSame($properties, (new Property($properties))->getProperties());
         
         return;
     }

@@ -375,7 +375,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_attach_throwsPropertyRedeclarationException_ifPropertiesCollide()
     {
-        $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Properties');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Property');
         
         // the PropertyRedeclaration entity redeclares the foo property
         (new Classes\Foo())->attach(new Classes\Error\PropertyRedeclaration());

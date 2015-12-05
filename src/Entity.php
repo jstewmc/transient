@@ -329,7 +329,7 @@ abstract class Entity
         
         // if property names collide, short-circuit
         if ($this->hasAnyProperties($properties)) {
-            throw new Exception\Redeclaration\Properties(
+            throw new Exception\Redeclaration\Property(
                 $this->intersectProperties($properties)
             );
         }
