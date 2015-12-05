@@ -19,9 +19,10 @@ class Foo extends Entity
     }
 }
 
-// and, let's define a simple class
+// and, let's define a simple class, Bar
 // note that Bar does not have a "foo" property, but it does have a bar() method
 //
+class Bar 
 {
     public function bar()
     {
@@ -45,7 +46,7 @@ Cool huh?! The Transient library allows you to move methods and properties betwe
 
 ## Usage
 
-To attach methods and properties to another object using the `attach()` method, the _destination_ object must extend the `Entity` classs:
+To add methods and properties to another object, use the `attach()` method. Keep in mind, the _destination_ object must extend the `Entity` classs:
 
 ```php
 use Jstewmc\Transient\Entity;
@@ -72,7 +73,7 @@ $foo->bar;  // returns "bar"
 $bar->attach($foo);
 ```
 
-You can attach entities to other entities. But, just keep in mind, properties and methods are only attached in one direction. Order matters:
+You can attach entities to other entities. However, properties and methods are only attached in one direction. Order matters. Make sure you attach your entities in reverse order (i.e., the innermost entity is attached first):
 
 ```php
 use Jstewmc\Transient\Entity;
@@ -135,7 +136,7 @@ $foo->foo();  // returns 1
 
 Obviously, this opens up a potential problem where the _source_ entity expects the _destination_ entity to have certain properties and methods. If it doesn't, the _source_ entity's methods will break. 
 
-If your _source_ object is an entity, you can list its required properties and methods in its `requiredProperties` and `requiredMethods` properties. If you attempt to attach a _source_ entity to a _destination_ entity and the _source_ entity's requirements are not met, a `Jstwemc\Transient\Exception\NotFound\{Properties|Methods}` will be thrown.
+If your _source_ object is an entity, you can list its required properties and methods in its `requiredProperties` and `requiredMethods` properties. If you attempt to attach a _source_ entity to a _destination_ entity and the _source_ entity's requirements are not met, a `Jstewmc\Transient\Exception\NotFound\Property` or `Jstewmc\Transient\Exception\NotFound\Method` will be thrown.
 
 ```php
 namespace Jstewmc\Transient;
@@ -193,7 +194,7 @@ Of course, this library isn't perfect. There are limitations like unique names, 
 
 ### Unique names
 
-You MUST use unique property and method names. You cannot attach a _source_ object to a _destination_ entity if the two objects have a method or property name in common. Otherwise, an `Exception\Redeclaration\Methods` or `Exception\Redeclaration\Properties` will be thrown.
+Except for the `__construct()` and `__destruct()` magic methods, you MUST use unique property and method names. You cannot attach a _source_ object to a _destination_ entity if the two objects have a method or property name in common. Otherwise, an `Exception\Redeclaration\Method` or `Exception\Redeclaration\Property` will be thrown.
 
 For example, the following code _will not work_:
 
@@ -213,8 +214,8 @@ class Foo2 extends Entity
 $foo1 = new Foo1();
 $foo2 = new Foo2();
 
-// this will NOT work, because the method and property names collide
-// this will throw an Exception\Redeclaration\Properties!
+// this will NOT work, because the property names collide
+// this will throw an Exception\Redeclaration\Property
 //
 $foo1->attach($foo2);
 ```
@@ -242,18 +243,23 @@ I've tried to disallow overriding the base methods where I can with the `final` 
 * `detachMethods()`
 * `detachProperties()`
 * `detachProperty()`
+* `diffMethods()`
+* `diffProperties()`
+* `filterMethods()`
 * `getCallingClass()`
 * `getDefinedMethods()`
 * `getDefinedProperties()`
 * `getMethods()`
+* `getObjectMethods()`
+* `getObjectProperties()`
 * `getProperties()`
 * `getTransientMethods()`
 * `getTransientProperties()`
-* `listMethods()`
-* `listProperties()`
+* `hasAllMethods()`
+* `hasAnyMethods()`
 * `hasMethod()`
-* `hasMethods()`
-* `hasProperties()`
+* `hasAllProperties()`
+* `hasAnyProperties()`
 * `hasProperty()`
 * `intersectMethods()`
 * `insersectProperties()`
@@ -289,16 +295,7 @@ When attaching a _source_ object to a _destination_ entity:
 
 ## That's it!
 
-That's about it! This is the first version. Of course, I'm sure I missed something. Any issues, comments, and suggestions are appreciated.
-
-Here are a few improvements I'm thinking about:
-
-* ~~Do you have to attach an Entity? Why not just allow the programmer to attach an entity or a vanilla object?~~ (Done!)
-* ~~We should allow a _source_ entity to define requirements, like an interface it expects the _destination_ entity to implement at a minimum.~~
-* We should allow a calling class to defined requirements, like an interface that the entity, in its current state, must implement.
-* I should consolidate the `Exception\NotFound\Methods` and `Exception\NotFound\Method` as well as the `Exception\NotFound\Properties` and `Exception\NotFound\Property` exception classes. They basically do the same thing, and the difference is confusing.
-* Then, I should rename the `Exception\Redeclaration\Methods` and `Exception\Redeclaration\Properties` to the singular form.
-
+That's about it! This is the first version. I'm sure I missed something. Any issues, comments, and suggestions are appreciated.
 
 ## About
 
@@ -323,6 +320,15 @@ That's why I built the Transient library. With Transient, you can attach objects
 
 
 ## Version
+
+### dev-master - December 5, 2015
+
+* Add ability for each object to have `__construct()` and `__destruct()` methods.
+* Refactor `Exception\NotFound\Methods` to accept one or more method names.
+* Refactor `Exception\NotFound\Properties` to accept one or more method names.
+* Rename exceptions to singular form (e.g., "properties" to "property").
+* Fix a few README mistakes.
+* Fix a few bugs.
 
 ### dev-master - November 29, 2015
 
