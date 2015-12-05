@@ -320,6 +320,9 @@ abstract class Entity
             $properties = $refraction->getProperties();
         }
         
+        // filter out any black-listed methods
+        $methods = $this->filterMethods($methods);
+        
         // if method names collide, short-circuit
         if ($this->hasAnyMethods($methods)) {
             throw new Exception\Redeclaration\Method(
@@ -602,6 +605,23 @@ abstract class Entity
         return $diff;
     }
     
+    /**
+     * Filters an array of methods
+     *
+     * I'll remove the magic __construct() and __destruct() methods from the $methods 
+     * array.
+     *
+     * @param  Jstewmc\Refraction\RefractionMethod[]  $methods  the methods to filter
+     * @return  Jstewmc\Refraction\RefractionMethod[]
+     * @since   0.1.0
+     */
+    final protected function filterMethods($methods) 
+    {
+        unset($methods['__construct']);
+        unset($methods['__destruct']);
+        
+        return $methods;
+    }
     
     /**
      * Returns a magic method's calling class 
@@ -651,6 +671,9 @@ abstract class Entity
     /**
      * Returns the entity's *defined* methods indexed by name
      *
+     * Keep in mind, I'll always exclude the entity's __construct() and __destruct() 
+     * methods, if they are defined.
+     *
      * @return  Jstewmc\Refraction\RefractionMethod[]
      * @since   0.1.0
      */
@@ -660,7 +683,7 @@ abstract class Entity
         
         foreach ((new RefractionClass($this))->getMethods() as $method) {
             if ( ! $this->isBaseMethod($method)) {
-                $methods[$method->getName()] = $method;
+                $methods[$method->getName()] = $method;  
             }
         }
         

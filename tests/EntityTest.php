@@ -442,6 +442,26 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         return;
     }
     
+    /**
+     * attach() should return self if the source object has a constructor
+     */
+    public function test_attach_returnsSelf_ifObjectsHaveConstructors()
+    {
+        $foo = new Classes\Magic\Foo();
+        $bar = new Classes\Magic\Bar();
+        
+        $this->assertSame($foo, $foo->attach($bar));
+        
+        $this->assertEquals(
+            [
+                '__construct' => new RefractionMethod($foo, '__construct')
+            ],
+            $foo->getMethods()
+        );
+        
+        return;
+    }
+    
     
     /* !detach() */
     
