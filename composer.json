@@ -1,6 +1,6 @@
 {
 	"name": "jstewmc/transient",
-	"description": "Dynamic methods and properties in PHP",
+	"description": "Transient methods and properties in PHP",
 	"license": "MIT",
 	"keywords": ["PHP", "transient", "entity", "method", "property"],
 	"authors": [
