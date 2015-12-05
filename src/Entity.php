@@ -303,7 +303,7 @@ abstract class Entity
             
             // if the entity is missing a required property, short-circuit
             if ( ! $this->hasAllProperties($object->getRequiredProperties())) {
-                throw new Exception\NotFound\Properties(
+                throw new Exception\NotFound\Property(
                     $this->diffProperties($object->getRequiredProperties())
                 );
             }

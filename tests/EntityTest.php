@@ -347,7 +347,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_attach_throwsPropertyNotFoundException_ifRequiredPropertyMissing()
     {
-        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Properties');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\NotFound\\Property');
         
         // the PropertyNotFound entity requires a "qux" property
         (new Classes\Foo())->attach(new Classes\Error\PropertyNotFound());

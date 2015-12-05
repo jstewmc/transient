@@ -12,54 +12,33 @@ namespace Jstewmc\Transient\Exception\NotFound;
 /**
  * A property not found exception
  *
+ * A property not found exception is thrown when a property is undefined.
+ *
  * @since  0.1.0
  */
 class Property extends NotFound
-{
-    /* !Protected properties */
-    
-    /**
-     * @var    string  the property's name
-     * @since  0.1.0
-     */
-    protected $name;
-    
-    
-    /* !Get propertys */
-    
-    /**
-     * Returns the exception's property name
-     *
-     * @erturn  string  the property's name
-     * @since  0.1.0
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-    
-    
-    /* !Magic propertys */
+{   
+    /* !Magic methods */
     
     /**
      * Called when the exception is constructed
      *
-     * @param  string  $name  the property's name
+     * @param  string[]  $properties  the exception's properties
      * @return  self
-     * @throws  InvalidArgumentException  if $name is not a string
-     * @since   0.1.0
+     * @throws  InvalidArgumentException  if $names is neither a string nor array
+     * @since  0.1.0
      */
-    public function __construct($name)
+    public function __construct($names)
     {
-        if ( ! is_string($name)) {
-            throw new \InvalidArgumentException(
-                __METHOD__."() expects parameter one, name, to be a string"
-            );
+        parent::__construct($names);
+        
+        if (count($this->names) === 1) {
+            $this->message = "Property {$this->names[0]} could not be found";
+        } else {
+            $this->message = "The following properties could not be found: "
+                .implode(', ', $this->names);
         }
         
-        $this->name    = $name;
-        $this->message = "Property '$name' could not be found";
-        
         return;
-    }
+    }   
 }
