@@ -733,7 +733,7 @@ abstract class Entity
      * @return  Jstewmc\Refraction\RefractionProperty[]  
      * @since   0.1.0
      */
-    final protected function getObjectProperties()
+    final protected function getObjectProperties($object)
     {
         $properties = [];
         
@@ -766,21 +766,19 @@ abstract class Entity
        return $this->transientProperties; 
     }
     
-    /**
-     * Returns true if the entity has the method
+     /**
+     * Returns true if the entity has *all* of the methods
      *
-     * @param   Jstewmc\Refraction\RefractionMethod|string  $method  the method to 
-     *     test as a refraction object or string method name
+     * @param   Jstewmc\Refraction\RefractionMethod[]|string[]  $methods  the methods
+     *     to test as refraction objects or string method names
      * @return  bool
      * @since   0.1.0
      */
-    final protected function hasMethod($method)
+    final protected function hasAllMethods(Array $methods)
     {
-        if ($method instanceof RefractionMethod) {
-            $method = $method->getName();
-        }
-        
-        return array_key_exists($method, $this->getMethods());
+        return $methods === array_filter($methods, function ($method) {
+            return $this->hasMethod($method);
+        });
     }
     
     /**
@@ -803,17 +801,34 @@ abstract class Entity
     }
     
     /**
-     * Returns true if the entity has *all* of the methods
+     * Returns true if the entity has the method
      *
-     * @param   Jstewmc\Refraction\RefractionMethod[]|string[]  $methods  the methods
-     *     to test as refraction objects or string method names
+     * @param   Jstewmc\Refraction\RefractionMethod|string  $method  the method to 
+     *     test as a refraction object or string method name
      * @return  bool
      * @since   0.1.0
      */
-    final protected function hasAllMethods(Array $methods)
+    final protected function hasMethod($method)
     {
-        return $methods === array_filter($methods, function ($method) {
-            return $this->hasMethod($method);
+        if ($method instanceof RefractionMethod) {
+            $method = $method->getName();
+        }
+        
+        return array_key_exists($method, $this->getMethods());
+    }
+    
+    /**
+     * Returns true if the entity has *all* of the properties
+     *
+     * @param  Jstewmc\Refraction\RefractionProperty[]|string[]  $properties  the
+     *     properties to test as refraction objects or string property names
+     * @return  bool
+     * @since   0.1.0
+     */
+    final protected function hasAllProperties(Array $properties)
+    {
+        return $properties === array_filter($properties, function ($property) {
+            return $this->hasProperty($property);
         });
     }
     
@@ -834,21 +849,6 @@ abstract class Entity
         }
         
         return false;
-    }
-    
-    /**
-     * Returns true if the entity has *all* of the properties
-     *
-     * @param  Jstewmc\Refraction\RefractionProperty[]|string[]  $properties  the
-     *     properties to test as refraction objects or string property names
-     * @return  bool
-     * @since   0.1.0
-     */
-    final protected function hasAllProperties(Array $properties)
-    {
-        return $properties === array_filter($properties, function ($property) {
-            return $this->hasProperty($property);
-        });
     }
     
     /**
