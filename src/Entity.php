@@ -315,9 +315,8 @@ abstract class Entity
             // otherwise, it's a normal object
             // use refraction to get the object's methods and properties
             //
-            $refraction = new RefractionClass($object);
-            $methods    = $refraction->getMethods();
-            $properties = $refraction->getProperties();
+            $methods    = $this->getObjectMethods($object);
+            $properties = $this->getObjectProperties($object);
         }
         
         // filter out any black-listed methods
@@ -707,6 +706,42 @@ abstract class Entity
        }
        
        return $properties;
+    }
+    
+    /**
+     * Returns $object's methods
+     *
+     * @param   object  $object  the object to refract
+     * @return  Jstewmc\Refraction\RefractionMethod[]
+     * @since   0.1.0
+     */
+    final protected function getObjectMethods($object)
+    {
+        $methods = [];
+        
+        foreach ((new RefractionClass($object))->getMethods() as $method) {
+            $methods[$method->name] = $method;
+        }
+        
+        return $methods;
+    }
+    
+    /**
+     * Returns $object's properties
+     *
+     * @param  object  $object  the object to refract
+     * @return  Jstewmc\Refraction\RefractionProperty[]  
+     * @since   0.1.0
+     */
+    final protected function getObjectProperties()
+    {
+        $properties = [];
+        
+        foreach ((new RefractionClass($object))->getProperties() as $property) {
+            $properties[$property->name] = $property;
+        }
+        
+        return $properties; 
     }
     
     /**
