@@ -1,6 +1,6 @@
 <?php
 /**
- * The file for the methods redeclaration exception class
+ * The file for the method redeclaration exception class
  *
  * @author     Jack Clayton <clayjs0@gmail.com>
  * @copyright  2015 Jack Clayton
@@ -10,11 +10,11 @@
 namespace Jstewmc\Transient\Exception\Redeclaration;
 
 /**
- * A methods redeclaration exception
+ * A method redeclaration exception
  *
  * @since  0.1.0
  */
-class Methods extends Redeclaration
+class Method extends Redeclaration
 {
     /* !Protected properties */
     

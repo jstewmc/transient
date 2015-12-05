@@ -361,7 +361,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      */
     public function test_attach_throwsMethodRedeclarationException_ifMethodsCollide()
     {
-        $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Methods');
+        $this->setExpectedException('Jstewmc\\Transient\\Exception\\Redeclaration\\Method');
         
         // the MethodRedeclaration entity redeclares the getFoo() method
         (new Classes\Foo())->attach(new Classes\Error\MethodRedeclaration());

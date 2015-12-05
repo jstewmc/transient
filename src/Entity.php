@@ -322,7 +322,7 @@ abstract class Entity
         
         // if method names collide, short-circuit
         if ($this->hasAnyMethods($methods)) {
-            throw new Exception\Redeclaration\Methods(
+            throw new Exception\Redeclaration\Method(
                 $this->intersectMethods($methods)
             );
         }

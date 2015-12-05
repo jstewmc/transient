@@ -1,6 +1,6 @@
 <?php
 /**
- * The file for the methods redeclaration exception test class
+ * The file for the method redeclaration exception test class
  *
  * @author     Jack Clayton <clayjs0@gmail.com>
  * @copyright  2015 Jack Clayton
@@ -14,11 +14,11 @@ use Jstewmc\Refraction\RefractionMethod;
 use Jstewmc\Transient\Tests\Classes\Foo;
 
 /**
- * The methods redeclaration exception test class
+ * The method redeclaration exception test class
  *
  * @since  0.1.0
  */
-class MethodsTest extends \PHPUnit_Framework_TestCase
+class MethodTest extends \PHPUnit_Framework_TestCase
 {
     /* !__construct() */
     
@@ -34,7 +34,7 @@ class MethodsTest extends \PHPUnit_Framework_TestCase
             new RefractionMethod($foo, 'setFoo')
         ];
         
-        $e = new Methods($methods);
+        $e = new Method($methods);
         
         $this->assertSame($methods, $e->getMethods());
         $this->assertEquals(
@@ -62,7 +62,7 @@ class MethodsTest extends \PHPUnit_Framework_TestCase
             new RefractionMethod($foo, 'setFoo')
         ];
         
-        $this->assertEquals($methods, (new Methods($methods))->getMethods());
+        $this->assertEquals($methods, (new Method($methods))->getMethods());
         
         return;
     }
