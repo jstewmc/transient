@@ -17,30 +17,7 @@ namespace Jstewmc\Transient\Exception\NotFound;
  * @since  0.1.0
  */
 class Method extends NotFound
-{
-    /* !Protected properties */
-    
-    /**
-     * @var  string[]  the exception's method names
-     * @since  0.1.0
-     */
-    protected $names = [];     
-    
-    
-    /* !Get methods */
-    
-    /**
-     * Returns the exception's method names
-     *
-     * @return  string[]  
-     * @since   0.1.0
-     */
-    public function getNames()
-    {
-        return $this->names;
-    }
-    
-    
+{   
     /* !Magic methods */
     
     /**
@@ -53,14 +30,7 @@ class Method extends NotFound
      */
     public function __construct($names) 
     {
-        if ( ! is_string($names) && ! is_array($names)) {
-            throw new \InvalidArgumentException(
-                __METHOD__."() expects parameter one, methods, to be a string method "
-                    . "name or array of method names"
-            );    
-        }
-        
-        $this->names = (array) $names;
+        parent::__construct($names);
         
         if (count($names) === 1) {
             $this->message = "Method {$this->names[0]} could not be found";
